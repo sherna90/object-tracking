@@ -1,0 +1,11 @@
+build/*
+backup/*
+*.pyc
+.vscode/*
+scripts/images/*
+scripts/results/*
+scripts/data/*
+data/
+results/*
+env/
+env/*

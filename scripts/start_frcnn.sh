@@ -1,0 +1,1 @@
+python ../tests/test_frcnn.py -i data/$1/$2/$3/img1/ -g data/$1/$2/$3/gt/gt.txt
