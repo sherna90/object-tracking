@@ -16,14 +16,14 @@ class DPP:
             if (weights is not None) and (features is not None):
                 area = np.empty(len(boxes), dtype = float)
                 intersection = np.empty((len(boxes), len(boxes)) , dtype = float)
-                for i in xrange(len(boxes)):
+                for i in range(len(boxes)):
                     x1 = boxes[i].bbox.x
                     y1 = boxes[i].bbox.y
                     w1 = boxes[i].bbox.width
                     h1 = boxes[i].bbox.height
                     area[i] = w1 * h1
 
-                    for j in xrange(i, len(boxes)):
+                    for j in range(i, len(boxes)):
                         x2 = boxes[j].bbox.x
                         y2 = boxes[j].bbox.y
                         w2 = boxes[j].bbox.width
@@ -108,14 +108,14 @@ class DPP:
         (img_width, img_height) = img_size
         diag = np.sqrt( np.power(img_height, 2) + np.power(img_width, 2) )
         
-        for i in xrange(len(tracks)):
+        for i in range(len(tracks)):
             feat1 = tracks[i].feature
             x1 = tracks[i].bbox.x
             y1 = tracks[i].bbox.y
             w1 = tracks[i].bbox.width
             h1 = tracks[i].bbox.height
             #print str(x1) + ',' + str(y1) + ',' + str(w1) + ',' + str(h1)
-            for j in xrange(i,len(tracks)):
+            for j in range(i,len(tracks)):
                 feat2 = tracks[j].feature
                 x2 = tracks[j].bbox.x
                 y2 = tracks[j].bbox.y

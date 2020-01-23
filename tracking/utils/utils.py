@@ -5,6 +5,7 @@ import math
 from sklearn.metrics.pairwise import euclidean_distances
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cosine
+from tracking.models.kalman_filter import KalmanFilter
 
 class Rectangle:
     def __init__(self, x, y, width, height):
@@ -12,6 +13,9 @@ class Rectangle:
         self.y = y
         self.width = width
         self.height = height
+    
+    def print(self):
+        print('x : ',self.x,',y:',self.y,'w : ',self.width,',h:',self.height)
 
 class Detection:
     def __init__(self, x, y, width, height, conf = None, feature = None):
@@ -22,11 +26,44 @@ class Detection:
 class Target:
     def __init__(self, bbox = None, label = None, color = None, conf = None, survival_rate = None, feature = None):
         self.bbox = bbox
+        detection = self.to_xyah(bbox)
+        self.kalman=KalmanFilter(detection)
         self.color = color
         self.label = label
         self.conf = conf
         self.survival_rate = survival_rate
         self.feature = feature
+    
+    def predict(self):
+        m,P=self.kalman.predict()
+        self.bbox = self.to_xywh(m)
+        return self.bbox
+
+    def update(self,bbox):
+        detection = self.to_xyah(bbox)
+        m,P=self.kalman.update(detection)
+        self.bbox = self.to_xywh(m)
+        return self.bbox
+
+    def to_xywh(self,mean):
+        """Convert bounding box to format `(x, y, width,height)`, 
+        """
+        width=int(mean[2])
+        height=int(mean[3])
+        x=int(mean[0] - width/2)
+        y=int(mean[1] - height/2)
+        bbox=Rectangle(x,y,width,height)
+        return bbox
+
+    def to_xyah(self,bbox):
+        """Convert bounding box to format `(center x, center y, aspect ratio,height)`, 
+            where the aspect ratio is `width / height`.
+        """
+        detection = np.array([int(bbox.x), int(bbox.y),int(bbox.width),int(bbox.height)])
+        detection[0] += detection[2] / 2
+        detection[1] += detection[3] / 2
+        #detection[2] /= detection[3]
+        return detection
 
 def get_overlap_ratio(A, B):
     dx = min(A[0] + A[2], B[0] + B[2]) - max(A[0], B[0])
@@ -164,3 +201,4 @@ def nms(boxes, thresh, neighbors = 0, minScoresSum = 0.0):
             resRects.append(boxes[lastElem[1]])
     
     return resRects
+
